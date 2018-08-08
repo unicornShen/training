@@ -17,23 +17,12 @@ public class GenerateAll {
     
     public static Map<String, String> baseData() {
         Map<String, String> map = new LinkedHashMap<String, String>();
-        map.put("Bulletin_Board_ToDo", "公佈欄-待辦事項");
-        map.put("SEQ", "序號");
-        map.put("YEAR", "查核年");
-        map.put("MONTH", "查核月");
-        map.put("AREA_ID", "區域代碼");
-        map.put("BRANCH_NBR", "分行代碼");
-        map.put("CHECK_FUNCTION", "各項查核");
-        map.put("CHECK_ITEM", "提醒事項");
-        map.put("CHECK_TOTAL", "應查核數");
-        map.put("UNCHECK_COUNT", "未查核人數");
-        map.put("TEMP_COUNT", "暫存數");
-        map.put("TODO_COUNT", "待處理數");
-        map.put("ADD_PROBLEM_COUNT", "新增問題數");
-        map.put("CHECK_SEQ", "問題種類 SEQ");
-        map.put("TXN_ID", "頁面ID");
-        map.put("SPECIAL_HOLD_MAIL", "保密戶(區域)(y/n)");
-        map.put("IS_DELAY", "是否超過查核時間(y/n)");
+        map.put("PBSS_CODE", "PBSS Code");
+        map.put("CURRENCY", "幣別");
+        map.put("ROI", "報酬率級距");
+        map.put("TOTAL_CNT", "客戶數");
+        map.put("TOTAL_AMT", "金額總計");
+        map.put("UPDATE_DATE", "最後異動日期");
         map.put("CREATOR", "建立者");
         map.put("CREATETIME", "建立時間");
         map.put("MODIFIER", "更新者");
@@ -46,6 +35,9 @@ public class GenerateAll {
 //        GenerateDto.genDto(turnKey(baseData()));
         GenerateDto.genDtoForCTBC(baseData());
         GenerateMappingCode.genSetMappingCode(turnKey(baseData()));
+        System.out.println("");
+        GenerateMappingCode.genSetThisCode(turnKey(baseData()));
+        System.out.println("");
         // GenerateMappingCode.genGetMappingCode(turnKey(baseData()));
         genList(baseData());
     }

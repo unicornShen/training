@@ -40,7 +40,9 @@ public class GenerateDto {
         reStr.append("\n");
 //        reStr.append("@TableColumnName(\"" + fieldName.toLowerCase() + "\")");
 //        reStr.append("\n");
-        reStr.append("@CsvColumn");
+//        reStr.append("@CsvColumn");
+//        reStr.append("\n");
+        reStr.append("@Column(name = \"" + fieldName + "\")"); // hibernate
         reStr.append("\n");
         reStr.append("private String " + GenerateAll.upperFirstCharByStr(fieldName.toLowerCase(), "_") + ";");
         reStr.append("\n");
