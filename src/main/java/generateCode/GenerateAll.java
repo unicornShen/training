@@ -14,44 +14,50 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 public class GenerateAll {
-    
+
     public static Map<String, String> baseData() {
-        Map<String, String> map = new LinkedHashMap<String, String>();
-        map.put("PBSS_CODE", "PBSS Code");
-        map.put("CURRENCY", "幣別");
-        map.put("ROI", "報酬率級距");
-        map.put("TOTAL_CNT", "客戶數");
-        map.put("TOTAL_AMT", "金額總計");
-        map.put("UPDATE_DATE", "最後異動日期");
-        map.put("CREATOR", "建立者");
-        map.put("CREATETIME", "建立時間");
-        map.put("MODIFIER", "更新者");
-        map.put("LASTUPDATE", "更新時間");
+        final Map<String, String> map = new LinkedHashMap<String, String>();
+        map.put("mao_consumer_cat_points_history", "貓糧使用紀錄");
+        map.put("mao_consumer_cat_points_history_seq", "貓糧使用紀錄序號");
+        map.put("mao_consumer_transaction_master_seq", "消費者交易主檔序號");
+        map.put("used_points", "使用點數");
 
         return map;
     }
-    
-    public static void main(String[] args){
-//        GenerateDto.genDto(turnKey(baseData()));
-        GenerateDto.genDtoForCTBC(baseData());
+
+    public static void main(String[] args) {
+        //        GenerateDto.genDto(turnKey(baseData()));
+//        GenerateDto.genDtoForCTBC(baseData());
         GenerateMappingCode.genSetMappingCode(turnKey(baseData()));
         System.out.println("");
         GenerateMappingCode.genSetThisCode(turnKey(baseData()));
         System.out.println("");
         // GenerateMappingCode.genGetMappingCode(turnKey(baseData()));
         genList(baseData());
-    }
-    
-    public static Map<String, String> turnKey(Map<String, String> map){
-        Map<String, String> reMap = new LinkedHashMap<String, String>();
+        System.out.println("");
+
         
-        for(String key : map.keySet()){
+        System.out.println("[Model]------------------------------------------------");
+        GenerateMao.genModel(baseData());
+        System.out.println("[RPY]------------------------------------------------");
+        GenerateMao.genRpy(baseData());
+        System.out.println("[DAO]------------------------------------------------");
+        GenerateMao.genDao(baseData());
+        System.out.println("[Service]------------------------------------------------");
+        GenerateMao.genService(baseData());
+        System.out.println("------------------------------------------------");
+    }
+
+    public static Map<String, String> turnKey(Map<String, String> map) {
+        Map<String, String> reMap = new LinkedHashMap<String, String>();
+
+        for (String key : map.keySet()) {
             reMap.put(upperFirstCharByStr(key.toLowerCase(), "_"), map.get(key));
         }
-        
+
         return reMap;
     }
-    
+
     /**
      * <b>First char turn to upper</b>
      * <p>
@@ -73,34 +79,31 @@ public class GenerateAll {
         } else {
             sortOut.append(inputStr);
         }
-        
 
         if (sortOut.toString().indexOf(keyStr) != -1) {
             temp = upperFirstCharByStr(sortOut.toString(), keyStr);
         }
 
-        if(StringUtils.isNotEmpty(temp)){
+        if (StringUtils.isNotEmpty(temp)) {
             return temp;
         }
-        
+
         return sortOut.toString();
     }
-    
+
     /**
      * <b></b>
      * <p>
      */
-    public static List<String> genList(Map<String, String> map){
+    public static List<String> genList(Map<String, String> map) {
         List<String> reList = new ArrayList<String>();
-        
-        for(String key : map.keySet()){
+
+        for (String key : map.keySet()) {
             reList.add(upperFirstCharByStr(key.toLowerCase(), "_"));
             System.out.println(upperFirstCharByStr(key.toLowerCase(), "_"));
         }
-        
-        
+
         return reList;
     }
 
 }
-
