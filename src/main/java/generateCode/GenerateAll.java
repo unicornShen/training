@@ -17,22 +17,32 @@ public class GenerateAll {
 
     public static Map<String, String> baseData() {
         final Map<String, String> map = new LinkedHashMap<String, String>();
-        map.put("year_month", "年月");
-        map.put("area_desc", "區域");
-        map.put("branch_desc", "分行");
-        map.put("ao_id", "理專ID");
-        map.put("EMP_NAME", "理專");
-        map.put("PERSON_ROLE", "FA等級");
-        map.put("CUST_ID", "客戶ID");
-        map.put("CUST_NAME", "客戶姓名");
-        map.put("check_item", "查核項目");
-        map.put("checkStatus", "案件狀態");
-        map.put("CHECK_ITEM", "查核問題");
-        map.put("QUESTVER", "版號");
-        map.put("ANS", "查核結果");
-        map.put("ANSTEXT", "其他註記");
-        map.put("EMPNAME", "查核人");
-        map.put("REPLYDATE", "查核日期");
+        map.put("CLASS_CODE", "類別代碼");
+        map.put("CASE_TYPE", "案件分類");
+        map.put("REMIT_TYPE", "匯款方式");
+        map.put("TRANSFER_WAY", "發電通路");
+        map.put("ITEM_CODE", "項目代碼");
+        map.put("DETAIL_CODE", "細項代碼");
+        map.put("CM_CODE", "複選代碼");
+        map.put("SG_CODE", "單選代碼");
+        map.put("NUMBER_1", "數值1");
+        map.put("NUMBER_2", "數值2");
+        map.put("NUMBER_3", "數值3");
+        map.put("NUMBER_4", "數值4");
+        map.put("NUMBER_5", "數值5");
+        map.put("NUMBER_6", "數值6");
+        map.put("TEXT_1", "文字1");
+        map.put("TEXT_2", "文字2");
+        map.put("TEXT_3", "文字3");
+        map.put("CURR_CODE", "幣別條件");
+        map.put("FEE_CCY", "計價幣別");
+        map.put("CUST_ID", "顧客ID");
+        map.put("VALID_DATE", "到期日");
+        map.put("APPLY_UNIT", "申請單位");
+        map.put("CONTRACT_NO", "議約編號");
+        map.put("TYPE", "優惠類型");
+        map.put("APPLY_CHANNEL", "申請通路");
+        map.put("FEE_NORM_TYPE", "收費標準類型");
 
         return map;
     }
@@ -40,11 +50,11 @@ public class GenerateAll {
     public static void main(String[] args) {
         // GenerateDto.genDto(turnKey(baseData()));
         // GenerateDto.genDtoForCTBC(baseData());
-        // GenerateMappingCode.genSetMappingCode(turnKey(baseData()));
-        // System.out.println("");
-        // GenerateMappingCode.genSetThisCode(turnKey(baseData()));
-        // System.out.println("");
-        // GenerateMappingCode.genGetMappingCode(turnKey(baseData()));
+        GenerateMappingCode.genSetMappingCode(turnKey(baseData()));
+        System.out.println("");
+        GenerateMappingCode.genSetThisCode(turnKey(baseData()));
+        System.out.println("");
+        GenerateMappingCode.genGetMappingCode(turnKey(baseData()));
         genList(baseData());
         System.out.println("");
 

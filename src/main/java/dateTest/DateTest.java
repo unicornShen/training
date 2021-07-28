@@ -13,7 +13,8 @@ public class DateTest {
         //        testDate();
         //        testDatePreviousMonth();
         //        testDateAddDay();
-        testRunTime();
+//        testRunTime();
+        testAddYear();
     }
 
     private static void testDateSimpleFormat() {
@@ -84,13 +85,31 @@ public class DateTest {
 
         for (int i = 0; i < 99999999; i++) {
             for (int j = 0; j < 99999; j++) {
-                
+
             }
         }
 
         Date endTime = new Date();
 
         System.out.println(endTime.getTime() - startTime.getTime());
-        System.out.println((endTime.getTime() - startTime.getTime())*1.0/1000);
+        System.out.println((endTime.getTime() - startTime.getTime()) * 1.0 / 1000);
+    }
+
+    private static void testAddYear() {
+        try {
+            String dateStr = "2020/02/29";
+            
+            Calendar c = Calendar.getInstance();
+            SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
+
+            Date date = df.parse(dateStr);
+            c.setTime(date);
+            c.add(Calendar.YEAR, -1);
+            
+            System.out.println(dateStr + " -> " +df.format(c.getTime()));
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 }

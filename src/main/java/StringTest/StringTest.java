@@ -5,8 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class StringTest {
@@ -26,14 +27,18 @@ public class StringTest {
         // testSplitAfter11();
         // testSplit1();
 
-        //         testMatches();
+        // testMatches();
 
-        //        positiveNumber();
+        // positiveNumber();
 
-        Object object = 123;
-        System.out.println(ObjectUtils.identityToString(object));
-        System.out.println(ObjectUtils.toString(object));
-        System.out.println(ObjectUtils.defaultIfNull(object, "default Value"));
+        // Object object = 123;
+        // System.out.println(ObjectUtils.identityToString(object));
+        // System.out.println(ObjectUtils.toString(object));
+        // System.out.println(ObjectUtils.defaultIfNull(object, "default Value"));
+
+        // traceSubstring();
+        // testIndexOf();
+        testPatternMatcher();
     }
 
     public static void genInsert(String str) {
@@ -231,5 +236,35 @@ public class StringTest {
 
         String str3 = "123.456";
         System.out.println(str3.matches("^[(-)|(\\.)][0-9]+[\\..][0-9]+")); // XXX
+    }
+
+    public static void traceSubstring() {
+        String str = "1234567890一二三四五六七八九零";
+        System.out.println(str.subSequence(15, 16));
+        System.out.println(str.subSequence(0, 15));
+        System.out.println(str.subSequence(3, 7));
+        System.out.println(str.subSequence(10, 15));
+    }
+
+    public static void testIndexOf() {
+        String str = "asdfghjbBnmd";
+        System.out.println(str.indexOf(92));
+    }
+
+    public static void testPatternMatcher() {
+        String fullSpcName = "HK-HONGKONG";
+        String[] checkSpcNames = fullSpcName.split("-");
+        String checkSpcName_1 = checkSpcNames[0];
+        String checkSpcName_2 = checkSpcNames[1];
+
+        String patternStr = "(\\s|^)" + checkSpcName_1 + "(\\s|$)";
+        Pattern pattern = Pattern.compile(patternStr);
+
+        String engName = "213 HK 456";
+        Matcher matcher_db = pattern.matcher(engName);
+        if (matcher_db.find()) {
+            String newEngName = matcher_db.replaceAll(" " + checkSpcName_2 + " ").trim();
+            System.out.println(newEngName); // 213 HONGKONG 456
+        }
     }
 }
