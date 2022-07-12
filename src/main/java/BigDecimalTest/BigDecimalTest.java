@@ -3,24 +3,31 @@ package BigDecimalTest;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class BigDecimalTest {
     public static void main(String[] args) {
-        
-        //        testHalfUp();
-        //	    testC();
-        //        testMathContext();
-//        testSetScale();
-        //        testD();
-        //        testD_final();
-        //        testGetMillion();
-        
-        testToInt();
+
+        // testHalfUp();
+        // testHalfUp2();
+        // testC();
+        // testMathContext();
+        // testSetScale();
+        // testD();
+        // testD_final();
+        // testGetMillion();
+
+        // testToInt();
+        // testNumberFormat();
+        // testError();
+
+        testMultiply();
     }
 
     private static void testHalfUp() {
@@ -69,6 +76,12 @@ public class BigDecimalTest {
         } else {
             return null;
         }
+    }
+
+    /** 四捨五入至整數. */
+    private static void testHalfUp2() {
+        BigDecimal scaled = new BigDecimal("123456.54321").setScale(0, RoundingMode.HALF_UP);
+        System.out.println(scaled);
     }
 
     private static void testC() {
@@ -159,9 +172,9 @@ public class BigDecimalTest {
             System.out.println(row);
         }
 
-        //        for (int i = rowList.size(); i >= 1; i--) {
-        //            System.out.println(i);
-        //        }
+        // for (int i = rowList.size(); i >= 1; i--) {
+        // System.out.println(i);
+        // }
     }
 
     private static BigDecimal getTotal(final List<BigDecimal> list) {
@@ -183,11 +196,52 @@ public class BigDecimalTest {
         final BigDecimal million = new BigDecimal("1000000");
         System.out.println(number.divide(million, 0, RoundingMode.HALF_UP));
     }
-    
+
     private static void testToInt() {
         final BigDecimal number = new BigDecimal("0.123");
-        
+
         System.out.println(number.floatValue());
+    }
+
+    /**
+     * 格式化
+     */
+    private static void testNumberFormat() {
+        NumberFormat currency = NumberFormat.getCurrencyInstance(); // 建立貨幣格式化引用
+        currency.setParseIntegerOnly(true);
+        currency.setRoundingMode(RoundingMode.HALF_UP);
+        currency.setMinimumFractionDigits(4); // 最小 小數點位數
+
+        NumberFormat percent = NumberFormat.getPercentInstance(); // 建立百分比格式化引用
+        percent.setMaximumFractionDigits(3); // 百分比小數點最多3位
+
+        BigDecimal loanAmount = new BigDecimal("123456789.485555"); // 貸款金額
+        BigDecimal interestRate = new BigDecimal("0.008"); // 利率
+        BigDecimal interest = loanAmount.multiply(interestRate); // 相乘
+
+        System.out.println("貸款金額:\t" + currency.format(loanAmount)); // 貸款金額: ￥150.48
+        System.out.println("利率:\t" + percent.format(interestRate)); // 利率: 0.8%
+        System.out.println("利息:\t" + currency.format(interest)); // 利息: ￥1.20
+    }
+
+    private static void testError() {
+        final NumberFormat currTwd = NumberFormat.getCurrencyInstance();
+        currTwd.setMaximumFractionDigits(0);
+        currTwd.setMinimumFractionDigits(0);
+
+        BigDecimal amount = new BigDecimal("123456789.485555");
+
+        System.out.println(StringUtils.replaceOnce(currTwd.format(null), "$", ""));
+    }
+
+    private static void testMultiply() {
+        BigDecimal amount = new BigDecimal("0.00025");
+        BigDecimal rate = new BigDecimal("100");
+        BigDecimal result = amount.multiply(rate); // 相乘
+        System.out.println(result);
+
+        final DecimalFormat df = new DecimalFormat("#.#####");
+        System.out.println(df.format(result));
     }
 
 }

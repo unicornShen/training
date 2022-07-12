@@ -8,7 +8,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.commons.text.StringSubstitutor;
 
 public class StringTest {
 
@@ -38,7 +41,12 @@ public class StringTest {
 
         // traceSubstring();
         // testIndexOf();
-        testPatternMatcher();
+        // testPatternMatcher();
+
+        // testSplitSeq();
+        // testGenUrlParm();
+        testReplaceParm1();
+        // testReplaceParm2();
     }
 
     public static void genInsert(String str) {
@@ -266,5 +274,87 @@ public class StringTest {
             String newEngName = matcher_db.replaceAll(" " + checkSpcName_2 + " ").trim();
             System.out.println(newEngName); // 213 HONGKONG 456
         }
+    }
+
+    public static void testSplitSeq() {
+        String str = "0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3,011,111,211,311,022,122,222,322,033,133,233,333,044,144,244,344,055,155,255,355,066,166,266,366,077,177,277,377,";
+
+        final List<String> list = new ArrayList<>();
+        getSplitSeq(list, str);
+        for (String ans : list) {
+            System.out.println("ans = " + ans);
+        }
+    }
+
+    /** 遞迴切割刪除SEQ清單；太長丟到 DB 去查詢會壞掉. */
+    public static void getSplitSeq(List<String> list, String str) {
+        int length = StringUtils.length(str);
+
+        if (length > 100) {
+            int last = StringUtils.lastIndexOf(str, ",", 100);
+
+            String before = StringUtils.substring(str, 0, last);
+            String after = StringUtils.substring(str, last);
+
+            list.add(before);
+            getSplitSeq(list, after);
+
+        } else {
+            list.add(str);
+        }
+    }
+
+    /** 產 URL 後面的參數. */
+    public static void testGenUrlParm() {
+        final NoticeParm parm = new NoticeParm();
+        parm.setCaseType("AP");
+        parm.setCaseSeq(125L);
+
+        // ?todoItemSeq=0000&caseSeq=0000&stageId=XXXX&caseType=XX&status=XXXX
+        final StringBuilder sb = new StringBuilder();
+        sb.append("?");
+
+        for (Field f : FieldUtils.getAllFields(NoticeParm.class)) {
+            try {
+                final Object value = PropertyUtils.getProperty(parm, f.getName());
+                if (value != null) {
+                    sb.append("&");
+                    sb.append(f.getName());
+                    sb.append("=");
+                    sb.append(value);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println(StringUtils.replaceOnce(sb.toString(), "&", ""));
+    }
+
+    public static void testReplaceParm1() {
+        String str = "Tran.Cert.-{remitNo}.pdf";
+        String param = StringUtils.substringBetween(str, "{", "}");
+
+        System.out.println("param = " + param);
+
+        String ans = StringUtils.replace(str, "{" + param + "}", "XXX123456789");
+        System.out.println("ans = " + ans);
+    }
+
+    // https://commons.apache.org/proper/commons-text/apidocs/org/apache/commons/text/StringSubstitutor.html
+    public static void testReplaceParm2() {
+        String str = "Tran.Cert.-${remitNo}.pdf";
+
+        // Build map
+        Map<String, String> valuesMap = new HashMap<>();
+        valuesMap.put("remitNo", "CV12345679");
+
+        // Build StringSubstitutor
+        StringSubstitutor sub = new StringSubstitutor(valuesMap);
+
+        // Replace
+        String resolvedString = sub.replace(str);
+        System.out.println("resolvedString = " + resolvedString);
     }
 }

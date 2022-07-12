@@ -24,7 +24,7 @@ public class ComparatorTest {
 
         Unicorn u2 = new Unicorn();
         u2.setAge(33);
-        u2.setName("u2");
+        u2.setName("");
 
         Unicorn u3 = new Unicorn();
         u3.setAge(22);
@@ -39,19 +39,36 @@ public class ComparatorTest {
     }
 
     private static void sortTest(final List<Unicorn> list) {
-        Comparator<Unicorn> com = new TryComparator();
-        Collections.sort(list, com);
+        // Comparator<Unicorn> com = new TryComparator();
+        // Collections.sort(list, com);
+        //
+        // for (Unicorn u : list) {
+        // System.out.println(u.getAge() + ":" + u.getName());
+        // }
+
+        // Comparator<Unicorn> com2 = new TryComparatorByName();
+        // Collections.sort(list, com2);
+        //
+        // for (Unicorn u : list) {
+        // System.out.println(u.getAge() + ":" + u.getName());
+        // }
+
+        Collections.sort(list, new TryComparatorByMulti());
 
         for (Unicorn u : list) {
             System.out.println(u.getAge() + ":" + u.getName());
         }
+    }
 
-//        Comparator<Unicorn> com2 = new TryComparatorByName();
-//        Collections.sort(list, com2);
-//
-//        for (Unicorn u : list) {
-//            System.out.println(u.getAge() + ":" + u.getName());
-//        }
+    public static void testInnerClass(final List<Unicorn> list) {
+        Collections.sort(list, new Comparator<Unicorn>() {
+            @Override
+            public int compare(Unicorn o1, Unicorn o2) {
+                return new CompareToBuilder() //
+                        .append(o1.getAge(), o2.getAge()) //
+                        .toComparison();
+            }
+        });
     }
 
     /**

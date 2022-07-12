@@ -9,12 +9,13 @@ import java.util.GregorianCalendar;
 public class DateTest {
 
     public static void main(String[] args) {
-        //        testDateSimpleFormat();
-        //        testDate();
-        //        testDatePreviousMonth();
-        //        testDateAddDay();
-//        testRunTime();
-        testAddYear();
+        // testDateSimpleFormat();
+        // testDate();
+        // testDatePreviousMonth();
+        // testDateAddDay();
+        // testRunTime();
+        // testAddYear();
+        testWeekOfMonth();
     }
 
     private static void testDateSimpleFormat() {
@@ -66,7 +67,7 @@ public class DateTest {
     }
 
     /**
-     * 測+20天，會自動換月。 
+     * 測+20天，會自動換月。
      */
     private static void testDateAddDay() {
         Calendar c = new GregorianCalendar();
@@ -98,15 +99,35 @@ public class DateTest {
     private static void testAddYear() {
         try {
             String dateStr = "2020/02/29";
-            
+
             Calendar c = Calendar.getInstance();
             SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
 
             Date date = df.parse(dateStr);
             c.setTime(date);
             c.add(Calendar.YEAR, -1);
-            
-            System.out.println(dateStr + " -> " +df.format(c.getTime()));
+
+            System.out.println(dateStr + " -> " + df.format(c.getTime()));
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void testWeekOfMonth() {
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
+        try {
+            Date date1 = df.parse("20220428");
+            Date date2 = df.parse("20220419");
+
+            Calendar c1 = Calendar.getInstance();
+            c1.setTime(date1);
+            Calendar c2 = Calendar.getInstance();
+            c2.setTime(date2);
+
+            // 顯示那個月的第幾週.
+            System.out.println(c1.get(Calendar.WEEK_OF_MONTH));
+            System.out.println(c2.get(Calendar.WEEK_OF_MONTH));
 
         } catch (ParseException e) {
             e.printStackTrace();
