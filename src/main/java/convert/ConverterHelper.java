@@ -6,9 +6,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.log4j.Logger;
@@ -129,7 +129,7 @@ public class ConverterHelper {
             return value;
         }
 
-        final String strValue = ObjectUtils.toString(value);
+        final String strValue = Objects.toString(value);
         if (type.equals(int.class)) {
             return NumberUtils.toInt(strValue);
         } else if (type.equals(Integer.class)) {

@@ -1,18 +1,20 @@
 package convert;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -22,6 +24,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 /**
  * <pre>
@@ -112,7 +115,7 @@ public class ConvertUtil {
             }
 
             try {
-                rtnMap.put(f.getName(), PropertyUtils.getProperty(obj, f.getName()));
+                rtnMap.put(f.getName(), PropertyUtils.getProperty(obj, f.getName())); // field must have get and set.
 
             } catch (Exception e) {
                 LOGGER.warn("ConvertUtil.convertToParamMap error! {}", e.getMessage());
@@ -159,7 +162,7 @@ public class ConvertUtil {
                 }
 
                 try {
-                    final Object value = PropertyUtils.getProperty(obj, f.getName());
+                    final Object value = PropertyUtils.getProperty(obj, f.getName()); // field must have get and set.
                     PropertyUtils.setProperty(targetObj, f.getName(), value);
 
                 } catch (Exception e) {
@@ -171,6 +174,54 @@ public class ConvertUtil {
         }
 
         return targetObj;
+    }
+    
+    /**
+     * Object to list by target object method.
+     * 
+     * @param <T> 目標泛型
+     * @param obj 來源物件
+     * @param cls 目標物件型態
+     * @return T
+     */
+    public static <T> T objToVoByMethod(final Object obj, final Class<T> cls) {
+    	T targetObj = null;
+    	
+    	try {
+    		targetObj = cls.newInstance();
+    		
+    		final Map<String, Object> valueMap = new HashMap<>();
+    		for (Field f : obj.getClass().getDeclaredFields()) {
+    			if (StringUtils.equalsIgnoreCase(f.getName(), "serialVersionUID")) {
+    				continue;
+    			}
+    			final Object value = PropertyUtils.getProperty(obj, f.getName()); // field must have get and set.
+    			valueMap.put(f.getName() , value);
+    		}
+    		
+    		for (Method m : targetObj.getClass().getMethods()) {
+    			if (StringUtils.startsWith(m.getName(), "set") && !StringUtils.startsWith(m.getName(), "setValue")) {
+    				final String tempKey = StringUtils.replaceOnce(m.getName(), "set", "");
+    				final String key = StringUtils.lowerCase(StringUtils.substring(tempKey, 0, 1)) + StringUtils.substring(tempKey, 1);
+    				try {
+    					if (m.getGenericParameterTypes().length == 1) {
+    						final Object value = valueMap.get(key);
+    						LOGGER.debug("[ttt] key: {}, typeName: {}, value: {}", key, m.getGenericParameterTypes()[0].getTypeName(), value);
+    						m.invoke(targetObj, mappingValueByTypeName(m.getGenericParameterTypes()[0].getTypeName(), value));
+    					}
+						
+					} catch (Exception e) {
+			    		LOGGER.debug("ConvertUtil.objToVoByMethod invoke error! {}  e:{}", key, e.getMessage());
+					}
+    			}
+    		}
+    		
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		LOGGER.debug("ConvertUtil.objToVoByMethod newInstance() error! {}", e.getMessage());
+    	}
+    	
+    	return targetObj;
     }
 
     /**
@@ -251,19 +302,19 @@ public class ConvertUtil {
         Object result = value;
 
         if (StringUtils.equals(f.getGenericType().getTypeName(), BigDecimal.class.getName())) {
-            result = new BigDecimal(ObjectUtils.toString(value));
+            result = new BigDecimal(Objects.toString(value));
 
         } else if (StringUtils.equals(f.getGenericType().getTypeName(), String.class.getName())) {
-            result = ObjectUtils.toString(value);
+            result = Objects.toString(value);
 
         } else if (StringUtils.equals(f.getGenericType().getTypeName(), Integer.class.getName())) {
-            result = NumberUtils.toInt(ObjectUtils.toString(value));
+            result = NumberUtils.toInt(Objects.toString(value));
 
         } else if (StringUtils.equals(f.getGenericType().getTypeName(), int.class.getName())) {
-            result = NumberUtils.toInt(ObjectUtils.toString(value));
+            result = NumberUtils.toInt(Objects.toString(value));
 
         } else if (StringUtils.equals(f.getGenericType().getTypeName(), boolean.class.getName())) {
-            result = BooleanUtils.toBoolean(ObjectUtils.toString(value));
+            result = BooleanUtils.toBoolean(Objects.toString(value));
 
         } else {
             LOGGER.info("ConvertUtil.mappingValueType(): This type not hanlde:{}", f.getGenericType().getTypeName());
@@ -271,6 +322,53 @@ public class ConvertUtil {
 
         return result;
     }
+    
+
+    /**
+     * Mapping value type.
+     * 
+     * @param typeName Generic type name.
+     * @param value 
+     * @return Object 回傳符合類型的值
+     */
+    private static Object mappingValueByTypeName(final String typeName, final Object value) {
+        Object result = value;
+
+		if (StringUtils.equals(typeName, BigDecimal.class.getName())) {
+            result = new BigDecimal(Objects.toString(value, "0"));
+
+        } else if (StringUtils.equals(typeName, String.class.getName())) {
+            result = Objects.toString(value);
+
+        } else if (StringUtils.equals(typeName, String[].class.getTypeName())) {
+        	JsonParser jp = new JsonParser();
+            JsonElement je = jp.parse(StringUtils.replace(StringUtils.replace(Objects.toString(value), " ", ""), "/", "")); // value 中空白、斜線會造成錯誤.
+
+            final List<String> resultList = new ArrayList<>();
+            for (Iterator<JsonElement> it = je.getAsJsonArray().iterator(); it.hasNext();) {
+                final JsonElement ele = it.next();
+                resultList.add(ele.getAsString());
+            }
+            result = resultList.toArray(new String[0]);
+        } else if (StringUtils.equals(typeName, Integer.class.getName())) {
+            result = new BigDecimal(Objects.toString(value, "0")).intValue();
+
+        } else if (StringUtils.equals(typeName, int.class.getName())) {
+            result = new BigDecimal(Objects.toString(value, "0")).intValue();
+
+        } else if (StringUtils.equals(typeName, boolean.class.getName())) {
+            result = BooleanUtils.toBoolean(Objects.toString(value));
+
+        } else if (StringUtils.equals(typeName, Long.class.getTypeName())) {
+        	result = NumberUtils.toLong(Objects.toString(value));
+        	
+        } else {
+            LOGGER.info("ConvertUtil.mappingValueByTypeName(): This type not handle: {}", typeName);
+        }
+
+        return result;
+    }
+
 
     //-------------------------------------
     //----
@@ -323,7 +421,7 @@ public class ConvertUtil {
         dynamicSql.append(System.lineSeparator());
         if (condition != null) {
             for (Entry<String, Object> entry : condition.entrySet()) {
-                if (StringUtils.isBlank(ObjectUtils.toString(entry.getValue()))) {
+                if (StringUtils.isBlank(Objects.toString(entry.getValue()))) {
                     continue;
                 }
 
@@ -407,7 +505,7 @@ public class ConvertUtil {
         }
 
         for (Entry<String, ?> entry : map.entrySet()) {
-            resultMap.put(entry.getKey(), ObjectUtils.toString(entry.getValue()));
+            resultMap.put(entry.getKey(), Objects.toString(entry.getValue()));
         }
 
         return resultMap;
